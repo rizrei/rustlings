@@ -9,10 +9,20 @@
 use std::collections::HashMap;
 
 // A structure to store the goal details of a team.
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct TeamScores {
     goals_scored: u8,
     goals_conceded: u8,
+}
+
+impl TeamScores {
+    fn add_goals_scored(&mut self, golas: u8) {
+        self.goals_scored += golas
+    }
+
+    fn add_goals_conceded(&mut self, golas: u8) {
+        self.goals_conceded += golas
+    }
 }
 
 fn build_scores_table(results: &str) -> HashMap<&str, TeamScores> {
@@ -27,6 +37,11 @@ fn build_scores_table(results: &str) -> HashMap<&str, TeamScores> {
         let team_1_score: u8 = split_iterator.next().unwrap().parse().unwrap();
         let team_2_score: u8 = split_iterator.next().unwrap().parse().unwrap();
 
+        let team_scores = scores.entry(team_1_name).or_default();
+        update_team_score(team_scores, &team_1_score, &team_2_score);
+        let team_scores = scores.entry(team_2_name).or_default();
+        update_team_score(team_scores, &team_2_score, &team_1_score);
+
         // TODO: Populate the scores table with the extracted details.
         // Keep in mind that goals scored by team 1 will be the number of goals
         // conceded by team 2. Similarly, goals scored by team 2 will be the
@@ -34,6 +49,11 @@ fn build_scores_table(results: &str) -> HashMap<&str, TeamScores> {
     }
 
     scores
+}
+
+fn update_team_score(team_scores: &mut TeamScores, goals_scored: &u8, goals_conceded: &u8) {
+    team_scores.add_goals_scored(*goals_scored);
+    team_scores.add_goals_conceded(*goals_conceded);
 }
 
 fn main() {
